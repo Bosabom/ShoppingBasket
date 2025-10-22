@@ -1,13 +1,27 @@
+using Microsoft.EntityFrameworkCore;
+using ShoppingBasket.Server.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+// Register EF Core + Npgsql
+builder.Services.AddDbContext<ShoppingBasketDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DbConnection")));
+
 var app = builder.Build();
 
 app.UseDefaultFiles();
 app.MapStaticAssets();
+
+// Apply EF Core migrations at startup (optional but useful in dev)
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<ShoppingBasketDbContext>();
+    db.Database.Migrate();
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
