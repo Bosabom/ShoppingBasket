@@ -1,0 +1,47 @@
+#basket-form {
+    background-color: rgb(231, 255, 234);
+    width: 30em;
+    max-width: 100%;
+    margin: 2rem;
+    border: 3px solid black;
+    text-align: center;
+}
+
+.quantity-inputs {
+    border: 1px solid black;
+    width: 60%;
+    font-size: 1.2rem;
+    padding: 0.4rem;
+    line-height: 1.2;
+    margin-top: 0.2rem;
+}
+
+.quantity-inputs:hover {
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.94);
+}
+
+#button-submit-form {
+    display: inline-block;
+    width: 30%;
+    height: 40px;
+    background-color: #07aa0f;
+    color: white;
+    border: 1px black solid;
+    font-size: 1.25em;
+    font-weight: bold;
+    margin: 2rem 0rem 2rem;
+    padding: 5px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#button-submit-form:hover {
+    color: rgb(0, 0, 0);
+    border: 2px #000000 solid;
+}
+
+.clearfix:after {
+    content: "";
+    display: table;
+    clear: both;
+}

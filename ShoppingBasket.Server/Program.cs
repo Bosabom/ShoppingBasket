@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using ShoppingBasket.Server.Data;
+using ShoppingBasket.Server.DataTransfer;
+using ShoppingBasket.Server.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +17,7 @@ var app = builder.Build();
 
 app.UseDefaultFiles();
 app.MapStaticAssets();
+app.UseRouting();
 
 // Apply EF Core migrations at startup (optional but useful in dev)
 using (var scope = app.Services.CreateScope())
@@ -30,6 +33,24 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+RouteGroupBuilder items = app.MapGroup("/items");
+
+items.MapGet("/", GetAllItems);
+items.MapGet("/{id}", GetItemById);
+//app.MapGet("/items", GetAllItems).WithName("GetAllItems");
+
+
+static async Task<IResult> GetAllItems(ShoppingBasketDbContext db)
+{
+    return TypedResults.Ok(await db.Items.AsNoTracking().ToArrayAsync());
+}
+
+static async Task<IResult> GetItemById(long id, ShoppingBasketDbContext db)
+{
+    var item = await db.Items.FindAsync(id);
+    return item is not null ? TypedResults.Ok(item) : TypedResults.NotFound();
+}
 
 var summaries = new[]
 {
