@@ -1,8 +1,19 @@
+import { BrowserRouter, Routes, Route } from "react-router";
 import "./styles/App.css";
-import BasketForm from "./components/BasketForm";
+import AppNav from "./pages/AppNav";
+import Home from "./pages/Home";
+import History from "./pages/History";
 
 function App() {
-  return <BasketForm />;
+  return (
+    <BrowserRouter>
+      <AppNav homeRef="/" historyRef="/history" />
+      <Routes>
+        <Route index element={<Home />} />
+        <Route path="history" element={<History />} />
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
 export default App;

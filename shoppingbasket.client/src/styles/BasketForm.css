@@ -7,6 +7,11 @@
     text-align: center;
 }
 
+label {
+    display: block;
+    margin: 1rem;
+}
+
 .quantity-inputs {
     border: 1px solid black;
     width: 60%;
@@ -20,8 +25,13 @@
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.94);
 }
 
+p[role="alert"] {
+    color: rgb(241, 4, 4);
+    font-size: medium;
+}
+
 #button-submit-form {
-    display: inline-block;
+    display: block;
     width: 30%;
     height: 40px;
     background-color: #07aa0f;
@@ -29,7 +39,7 @@
     border: 1px black solid;
     font-size: 1.25em;
     font-weight: bold;
-    margin: 2rem 0rem 2rem;
+    margin: 2rem auto 2rem auto;
     padding: 5px;
     border-radius: 4px;
     cursor: pointer;
@@ -38,10 +48,4 @@
 #button-submit-form:hover {
     color: rgb(0, 0, 0);
     border: 2px #000000 solid;
-}
-
-.clearfix:after {
-    content: "";
-    display: table;
-    clear: both;
 }

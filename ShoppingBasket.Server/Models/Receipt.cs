@@ -11,6 +11,7 @@ namespace ShoppingBasket.Server.Models
         [Column("receipt_id")]
         public long ReceiptId { get; set; }
 
+        //FIXME: remove this
         //[Column("ítems")]
         //public List<Item> Items { get; set; } = new List<Item>();
 
@@ -28,6 +29,6 @@ namespace ShoppingBasket.Server.Models
         public decimal TotalCost { get; set; }
 
         [Column("created_datetime")]
-        public DateTime CreatedDateTime { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedDateTime { get; set; }
     }
 }

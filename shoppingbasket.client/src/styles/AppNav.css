@@ -1,0 +1,31 @@
+#horizontal-navbar {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+.navbar-ref {
+    float: left;
+}
+
+#horizontal-navbar .navbar-ref {
+    display: block;
+    text-align: center;
+    padding: 14px 16px;
+}
+
+/* 
+.navbar-ref:hover {
+    background-color: rgb(25, 38, 25);
+} */
+
+a {
+    font-weight: 500;
+    color: #1f07f9;
+    text-decoration: inherit;
+}
+
+a:hover {
+    color: #6736a7;
+}

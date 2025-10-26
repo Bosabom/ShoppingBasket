@@ -1,0 +1,13 @@
+.table {
+    border: 3px solid yellowgreen;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    border: 1px solid yellowgreen;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    text-align: center;
+    vertical-align: middle;
+}

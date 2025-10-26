@@ -15,6 +15,8 @@ namespace ShoppingBasket.Server.Data
         public DbSet<ItemOrdered> ItemsOrdered { get; set; }
         public DbSet<Receipt> Receipts { get; set; }
 
+        //TODO: Implement Discount entity and DbSet
+
         //public DbSet<Discount> Discounts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

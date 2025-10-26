@@ -1,15 +1,17 @@
 @ShoppingBasket.Server_HostAddress = https://localhost:7051
 
-GET {{ShoppingBasket.Server_HostAddress}}/weatherforecast/
-Accept: application/json
-
 ###
-
 GET {{ShoppingBasket.Server_HostAddress}}/items
 Accept: application/json
-###
 
+###
 GET {{ShoppingBasket.Server_HostAddress}}/items/1
 Accept: application/json
 
 ###
+GET {{ShoppingBasket.Server_HostAddress}}/receipts
+Accept: application/json
+
+###
+GET {{ShoppingBasket.Server_HostAddress}}/receipts/1
+Accept: application/json
