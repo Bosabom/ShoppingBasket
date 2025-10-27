@@ -11,13 +11,8 @@ namespace ShoppingBasket.Server.Models
         [Column("receipt_id")]
         public long ReceiptId { get; set; }
 
-        //FIXME: remove this
-        //[Column("ítems")]
-        //public List<Item> Items { get; set; } = new List<Item>();
-
-        //[ForeignKey]
-        [Column("item_ordered_ids")]
-        public long[] ItemOrderedIds { get; set; } = Array.Empty<long>();
+        [Column("receipt_number")]
+        public string ReceiptNumber { get; set; }
 
         [Column("sub_total_cost")]
         public decimal SubTotalCost { get; set; }
@@ -30,5 +25,8 @@ namespace ShoppingBasket.Server.Models
 
         [Column("created_datetime")]
         public DateTime CreatedDateTime { get; set; }
+
+        // navigation to ordered items
+        public virtual ICollection<ItemOrdered> ItemsOrdered { get; set; } = new List<ItemOrdered>();
     }
 }

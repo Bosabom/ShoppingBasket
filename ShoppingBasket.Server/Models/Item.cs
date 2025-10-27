@@ -1,4 +1,5 @@
 ﻿using ShoppingBasket.Server.Enums;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -16,9 +17,12 @@ namespace ShoppingBasket.Server.Models
         public ItemType ItemType { get; set; }
 
         [Column("description")]
-        public string Description { get; set; } = string.Empty;
+        public string Description { get; set; }
 
         [Column("price")]
         public decimal Price { get; set; }
+
+        // Navigation: all ordered lines that reference this item
+        public virtual ICollection<ItemOrdered> ItemsOrdered { get; set; } = new HashSet<ItemOrdered>();
     }
 }

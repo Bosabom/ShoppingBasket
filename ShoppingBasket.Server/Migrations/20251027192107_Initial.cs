@@ -30,29 +30,12 @@ namespace ShoppingBasket.Server.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "item_ordered",
-                columns: table => new
-                {
-                    item_ordered_id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    item_id = table.Column<long>(type: "bigint", nullable: false),
-                    quantity = table.Column<int>(type: "integer", nullable: false),
-                    price = table.Column<decimal>(type: "numeric", nullable: false),
-                    is_discounted = table.Column<bool>(type: "boolean", nullable: false),
-                    discounted_price = table.Column<decimal>(type: "numeric", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_item_ordered", x => x.item_ordered_id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "receipt",
                 columns: table => new
                 {
                     receipt_id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    item_ordered_ids = table.Column<long[]>(type: "bigint[]", nullable: false),
+                    receipt_number = table.Column<string>(type: "text", nullable: false),
                     sub_total_cost = table.Column<decimal>(type: "numeric", nullable: false),
                     total_discount = table.Column<decimal>(type: "numeric", nullable: true),
                     total_cost = table.Column<decimal>(type: "numeric", nullable: false),
@@ -61,6 +44,36 @@ namespace ShoppingBasket.Server.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_receipt", x => x.receipt_id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "item_ordered",
+                columns: table => new
+                {
+                    item_ordered_id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    item_id = table.Column<long>(type: "bigint", nullable: false),
+                    receipt_id = table.Column<long>(type: "bigint", nullable: false),
+                    quantity = table.Column<int>(type: "integer", nullable: false),
+                    price = table.Column<decimal>(type: "numeric", nullable: false),
+                    is_discounted = table.Column<bool>(type: "boolean", nullable: false),
+                    discounted_price = table.Column<decimal>(type: "numeric", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_item_ordered", x => x.item_ordered_id);
+                    table.ForeignKey(
+                        name: "FK_item_ordered_item_item_id",
+                        column: x => x.item_id,
+                        principalTable: "item",
+                        principalColumn: "item_id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_item_ordered_receipt_receipt_id",
+                        column: x => x.receipt_id,
+                        principalTable: "receipt",
+                        principalColumn: "receipt_id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.InsertData(
@@ -73,16 +86,26 @@ namespace ShoppingBasket.Server.Migrations
                     { 3L, "Semi-skimmed Milk (1L)", 2, 1.30m },
                     { 4L, "Apples bag", 3, 1m }
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_item_ordered_item_id",
+                table: "item_ordered",
+                column: "item_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_item_ordered_receipt_id",
+                table: "item_ordered",
+                column: "receipt_id");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "item");
+                name: "item_ordered");
 
             migrationBuilder.DropTable(
-                name: "item_ordered");
+                name: "item");
 
             migrationBuilder.DropTable(
                 name: "receipt");

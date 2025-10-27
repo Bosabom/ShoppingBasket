@@ -23,6 +23,18 @@ namespace ShoppingBasket.Server.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<ItemOrdered>()
+                .HasOne(io => io.Item)
+                .WithMany(i => i.ItemsOrdered)
+                .HasForeignKey(io => io.ItemId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<ItemOrdered>()
+                .HasOne(io => io.Receipt)
+                .WithMany(r => r.ItemsOrdered)
+                .HasForeignKey(io => io.ReceiptId)
+                .OnDelete(DeleteBehavior.Cascade);
+
             // Seed data for Items
             modelBuilder.Entity<Item>().HasData(
                 new Item { ItemId = 1, ItemType = ItemType.Soup, Description = "Tomato Soup (400g)", Price = 0.65m },

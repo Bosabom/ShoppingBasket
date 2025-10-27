@@ -15,3 +15,13 @@ Accept: application/json
 ###
 GET {{ShoppingBasket.Server_HostAddress}}/receipts/1
 Accept: application/json
+
+###
+GET {{ShoppingBasket.Server_HostAddress}}/receipts/detailed/1
+Accept: application/json
+
+###
+GET {{ShoppingBasket.Server_HostAddress}}/receipts/history
+Accept: application/json
+
+###

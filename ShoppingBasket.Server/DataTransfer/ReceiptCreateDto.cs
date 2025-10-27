@@ -1,6 +1,6 @@
 ﻿namespace ShoppingBasket.Server.DataTransfer
 {
-    public class CreateReceiptDto
+    public class ReceiptCreateDto
     {
         public int SoupQuantity { get; set; }
         public int BreadQuantity { get; set; }

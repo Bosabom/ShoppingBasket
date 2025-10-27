@@ -88,7 +88,7 @@ namespace ShoppingBasket.Server.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("ItemOrderedId"));
 
-                    b.Property<decimal?>("DiscountPrice")
+                    b.Property<decimal?>("DiscountedPrice")
                         .HasColumnType("numeric")
                         .HasColumnName("discounted_price");
 
@@ -108,7 +108,15 @@ namespace ShoppingBasket.Server.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("quantity");
 
+                    b.Property<long>("ReceiptId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("receipt_id");
+
                     b.HasKey("ItemOrderedId");
+
+                    b.HasIndex("ItemId");
+
+                    b.HasIndex("ReceiptId");
 
                     b.ToTable("item_ordered");
                 });
@@ -126,10 +134,10 @@ namespace ShoppingBasket.Server.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_datetime");
 
-                    b.PrimitiveCollection<long[]>("ItemOrderedIds")
+                    b.Property<string>("ReceiptNumber")
                         .IsRequired()
-                        .HasColumnType("bigint[]")
-                        .HasColumnName("item_ordered_ids");
+                        .HasColumnType("text")
+                        .HasColumnName("receipt_number");
 
                     b.Property<decimal>("SubTotalCost")
                         .HasColumnType("numeric")
@@ -146,6 +154,35 @@ namespace ShoppingBasket.Server.Migrations
                     b.HasKey("ReceiptId");
 
                     b.ToTable("receipt");
+                });
+
+            modelBuilder.Entity("ShoppingBasket.Server.Models.ItemOrdered", b =>
+                {
+                    b.HasOne("ShoppingBasket.Server.Models.Item", "Item")
+                        .WithMany("ItemsOrdered")
+                        .HasForeignKey("ItemId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ShoppingBasket.Server.Models.Receipt", "Receipt")
+                        .WithMany("ItemsOrdered")
+                        .HasForeignKey("ReceiptId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Item");
+
+                    b.Navigation("Receipt");
+                });
+
+            modelBuilder.Entity("ShoppingBasket.Server.Models.Item", b =>
+                {
+                    b.Navigation("ItemsOrdered");
+                });
+
+            modelBuilder.Entity("ShoppingBasket.Server.Models.Receipt", b =>
+                {
+                    b.Navigation("ItemsOrdered");
                 });
 #pragma warning restore 612, 618
         }

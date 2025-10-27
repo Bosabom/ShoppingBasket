@@ -11,13 +11,18 @@ namespace ShoppingBasket.Server.Models
         [Column("item_ordered_id")]
         public long ItemOrderedId { get; set; }
 
+        // FK to Item
         [Column("item_id")]
-        //[ForeignKey]
         public long ItemId { get; set; }
+
+        // FK to Receipt
+        [Column("receipt_id")]
+        public long ReceiptId { get; set; }
 
         [Column("quantity")]
         public int Quantity { get; set; }
 
+        // unit price stored on the ordered line
         [Column("price")]
         public decimal Price { get; set; }
 
@@ -26,5 +31,11 @@ namespace ShoppingBasket.Server.Models
 
         [Column("discounted_price")]
         public decimal? DiscountedPrice { get; set; }
+
+        [ForeignKey(nameof(ItemId))]
+        public virtual Item? Item { get; set; }
+
+        [ForeignKey(nameof(ReceiptId))]
+        public virtual Receipt? Receipt { get; set; }
     }
 }
