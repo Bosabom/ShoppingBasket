@@ -1,5 +1,6 @@
 import "/src/styles/BasketForm.css";
 import { useForm } from "react-hook-form";
+import httpService from "../utils/httpService";
 
 function BasketForm() {
   const {
@@ -8,16 +9,24 @@ function BasketForm() {
     formState: { errors },
   } = useForm();
 
-  //FIXME: change to calling HttpHelper for post receipt and render receipt from response
-  const onSubmit = (data) => {
-    console.log("data", data);
+  //FIXME: implement proper post request and handling data from response for Receipt generation on UI
+  const createReceipt = async (data) => {
+    try {
+      //forming body .json()
+      const requestBody = data;
+      const response = await httpService.post("/receipts", requestBody);
+      console.log("payload", data);
+      console.log("response", response);
+    } catch (error) {
+      console.log("Error creating receipt", error);
+    }
   };
 
   //TODO: move inputs to separate component with this signatures and errors handling
   return (
     <>
       {/*Shopping basket form*/}
-      <form id="basket-form" onSubmit={handleSubmit(onSubmit)}>
+      <form id="basket-form" onSubmit={handleSubmit(createReceipt)}>
         {/*Soup quantity input*/}
         <label htmlFor="soup-quantity">Soup (€0.65)</label>
         <input

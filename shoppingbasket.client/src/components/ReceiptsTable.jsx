@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import "/src/styles/ReceiptsTable.css";
+import { httpService } from "../utils/httpService";
 
 function ReceiptsTable() {
   const [receipts, setReceipts] = useState();
@@ -7,6 +8,16 @@ function ReceiptsTable() {
   useEffect(() => {
     populateReceiptsData();
   }, []);
+
+  //TODO: move this to separate receiptsService based on httpService with defined requests
+  async function populateReceiptsData() {
+    try {
+      const data = await httpService.get("/receipts");
+      setReceipts(data);
+    } catch (error) {
+      console.log("Error fetching receipts", error);
+    }
+  }
 
   const contents =
     receipts === undefined ? (
@@ -44,15 +55,6 @@ function ReceiptsTable() {
       {contents}
     </div>
   );
-
-  //FIXME: change to calling HttpHelper for get receipts request
-  async function populateReceiptsData() {
-    const response = await fetch("receipts");
-    if (response.ok) {
-      const data = await response.json();
-      setReceipts(data);
-    }
-  }
 }
 
 export default ReceiptsTable;
