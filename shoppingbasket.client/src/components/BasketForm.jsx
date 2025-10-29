@@ -34,12 +34,13 @@ function BasketForm() {
     }
   };
 
-  //TODO: fetch item and discounts data from API to populate into form
+  //TODO: fetch items and discounts data from API to populate into form
   return (
     <>
       {/*Shopping basket form*/}
       <form id="basket-form" onSubmit={handleSubmit(createReceipt)}>
         {/* TODO: move inputs to separate component with this signatures and errors handling */}
+
         {/*Soup quantity input*/}
         <label htmlFor="soup-quantity">Soup (€0.65)</label>
         <input
@@ -51,13 +52,21 @@ function BasketForm() {
           aria-invalid={errors.soupQuantity ? "true" : "false"}
         />
         {errors.soupQuantity?.type === "required" && (
-          <p role="alert">Soup quantity is required!</p>
+          <p role="alert" className="error-message">
+            Soup quantity is required!
+          </p>
         )}
         {errors.soupQuantity?.type === "min" && (
-          <p role="alert">Soup quantity should be greater than 0!</p>
+          <p role="alert" className="error-message">
+            Soup quantity should be greater than 0!
+          </p>
         )}
+
         {/*Bread quantity input*/}
         <label htmlFor="bread-quantity">Bread (€0.8)</label>
+        <p className="discount-description">
+          Buy 2 tins of soup and get a loaf of bread for half price
+        </p>
         <input
           type="number"
           id="bread-quantity"
@@ -67,11 +76,16 @@ function BasketForm() {
           aria-invalid={errors.breadQuantity ? "true" : "false"}
         />
         {errors.breadQuantity?.type === "required" && (
-          <p role="alert">Bread quantity is required!</p>
+          <p role="alert" className="error-message">
+            Bread quantity is required!
+          </p>
         )}
         {errors.breadQuantity?.type === "min" && (
-          <p role="alert">Bread quantity should be greater than 0!</p>
+          <p role="alert" className="error-message">
+            Bread quantity should be greater than 0!
+          </p>
         )}
+
         {/*Milk quantity input*/}
         <label htmlFor="milk-quantity">Milk (€1.3)</label>
         <input
@@ -83,13 +97,19 @@ function BasketForm() {
           aria-invalid={errors.milkQuantity ? "true" : "false"}
         />
         {errors.milkQuantity?.type === "required" && (
-          <p role="alert">Milk quantity is required!</p>
+          <p role="alert" className="error-message">
+            Milk quantity is required!
+          </p>
         )}
         {errors.milkQuantity?.type === "min" && (
-          <p role="alert">Milk quantity should be greater than 0!</p>
+          <p role="alert" className="error-message">
+            Milk quantity should be greater than 0!
+          </p>
         )}
+
         {/*Apples quantity input*/}
         <label htmlFor="apples-quantity">Apples (€1.00 per bag)</label>
+        <p className="discount-description">10% off this week</p>
         <input
           type="number"
           id="apples-quantity"
@@ -99,15 +119,19 @@ function BasketForm() {
           aria-invalid={errors.applesQuantity ? "true" : "false"}
         />
         {errors.applesQuantity?.type === "required" && (
-          <p role="alert">Apples quantity is required!</p>
+          <p role="alert" className="error-message">
+            Apples quantity is required!
+          </p>
         )}
         {errors.applesQuantity?.type === "min" && (
-          <p role="alert">Apples quantity should be greater than 0!</p>
+          <p role="alert" className="error-message">
+            Apples quantity should be greater than 0!
+          </p>
         )}
         <input type="submit" id="button-submit-form" value="Submit" />
       </form>
 
-      {error && <p className="error">{error}</p>}
+      {error && <p className="error-message">{error}</p>}
 
       {/* Render generated receipt when available */}
       {receipt && (

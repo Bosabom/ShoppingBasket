@@ -89,7 +89,7 @@ namespace ShoppingBasket.Server.Services
             }
 
             //Create items ordered
-            var itemsOrderedToCreate = await SetItemsOrdered(selectedItems, itemTypesQuantities);
+            var itemsOrderedToCreate = await BuildItemsOrdered(selectedItems, itemTypesQuantities);
 
             //Calculate receipt total cost
             decimal receiptTotalCost = itemsOrderedToCreate.Sum(i => i.TotalCost);
@@ -105,9 +105,18 @@ namespace ShoppingBasket.Server.Services
             return _mapper.Map<Receipt, ReceiptDto>(createdReceipt);
         }
 
-        private async Task<List<ItemOrdered>> SetItemsOrdered(List<Item> selectedItems, KeyValuePair<ItemType, int>[] TypeQuantityKeyValuePairs)
+        private async Task<List<ItemOrdered>> BuildItemsOrdered(List<Item> selectedItems, KeyValuePair<ItemType, int>[] TypeQuantityKeyValuePairs)
         {
             var itemsOrdered = new List<ItemOrdered>();
+
+            // compute quantities map for cross-item discounts
+            var quantities = TypeQuantityKeyValuePairs.ToDictionary(k => k.Key, v => v.Value);
+
+            quantities.TryGetValue(ItemType.Soup, out var soupQty);
+            quantities.TryGetValue(ItemType.Bread, out var breadQty);
+
+            // Determine how many bread loaves are eligible for the "Buy 2 soups => 1 bread at half price"
+            var eligibleDiscountedBreadUnits = Math.Min(breadQty, soupQty / 2);
 
             foreach (var keyValuePair in TypeQuantityKeyValuePairs)
             {
@@ -121,38 +130,84 @@ namespace ShoppingBasket.Server.Services
                 // create ItemOrdered only if item exists and calculate costs
                 if (item != null)
                 {
-                    decimal calculatedSubTotalCost = PriceCalculationHelper.CalculateSubTotalCost(item.Price, qty);
-                    var itemOrderedToCreate = new ItemOrdered
-                    {
-                        ItemId = item.ItemId,
-                        Quantity = qty,
-                        SubTotalCost = calculatedSubTotalCost,
-                        IsDiscounted = false,
-                        TotalCost = calculatedSubTotalCost
-                    };
-
                     // fetch discount for the item if any
                     var discountForItem = await _discountRepository.GetByItemIdAsync(item.ItemId);
 
-                    // apply discount if any
-                    if (discountForItem != null)
+                    // TODO: refactor multi-buy discount handling for more complex scenarios
+                    int multiBuyDiscountedUnits = 0;
+                    // For multi-buy discounts that affect this item (bread), pass the number of discounted units.
+                    if (itemType == ItemType.Bread && discountForItem != null && discountForItem.DiscountType == DiscountType.MultiBuy)
                     {
-                        //TODO: implement more discount types if needed
-                        //TODO: Multi-buy: Buy 2 tins of soup and get a loaf of bread for half price. 
-                        itemOrderedToCreate.IsDiscounted = true;
-                        itemOrderedToCreate.DiscountId = discountForItem.DiscountId;
-                        if (discountForItem.Percentage.HasValue)
-                        {
-                            decimal calculatedDiscountedCost = PriceCalculationHelper.CalculateDiscountedCost(item.Price, qty, discountForItem.Percentage.Value);
-                            itemOrderedToCreate.DiscountedCost = calculatedDiscountedCost;
-                            itemOrderedToCreate.TotalCost = calculatedDiscountedCost;
-                        }
+                        multiBuyDiscountedUnits = eligibleDiscountedBreadUnits;
                     }
+
+                    // create ItemOrdered and apply discount if any
+                    var itemOrderedToCreate = SetItemOrdered(item.ItemId, item.Price, qty, discountForItem, multiBuyDiscountedUnits);
                     itemsOrdered.Add(itemOrderedToCreate);
                 }
             }
-
             return itemsOrdered;
+        }
+
+        private ItemOrdered SetItemOrdered(long itemId, decimal pricePerItem, int quantity, Discount? discount = null, int multiBuyDiscountedUnits = 0)
+        {
+            decimal calculatedSubTotalCost = PriceCalculationHelper.CalculateSubTotalCost(pricePerItem, quantity);
+            var itemOrdered = new ItemOrdered
+            {
+                ItemId = itemId,
+                Quantity = quantity,
+                SubTotalCost = calculatedSubTotalCost,
+                IsDiscounted = false,
+                TotalCost = calculatedSubTotalCost
+            };
+
+            // apply discount if any
+            if (discount != null)
+            {
+                itemOrdered.IsDiscounted = true;
+                itemOrdered.DiscountId = discount.DiscountId;
+
+                switch (discount.DiscountType)
+                {
+                    case DiscountType.Percentage:
+                        if (discount.Percentage.HasValue)
+                        {
+                            decimal calculatedDiscountedCost = PriceCalculationHelper.CalculateDiscountedCost(pricePerItem, quantity, discount.Percentage.Value);
+                            itemOrdered.DiscountedCost = calculatedDiscountedCost;
+                            itemOrdered.TotalCost = calculatedDiscountedCost;
+                        }
+                        break;
+
+                    //TODO: extend multi-buy logic for more complex scenarios
+                    case DiscountType.MultiBuy:
+                        // e.g. buy 2 soups => 1 bread at 50% off: discount.Percentage should represent 50
+                        if (multiBuyDiscountedUnits > 0 && discount.Percentage.HasValue)
+                        {
+                            // cost for discounted units
+                            decimal discountedPartTotal = PriceCalculationHelper.CalculateDiscountedCost(pricePerItem, multiBuyDiscountedUnits, discount.Percentage.Value);
+                            // cost for remaining units (full price)
+                            int remainingUnits = Math.Max(0, quantity - multiBuyDiscountedUnits);
+                            decimal remainingPartTotal = PriceCalculationHelper.CalculateSubTotalCost(pricePerItem, remainingUnits);
+                            // total cost = discounted part + remaining part
+                            decimal total = Math.Round(discountedPartTotal + remainingPartTotal, 2);
+
+                            itemOrdered.DiscountedCost = discountedPartTotal;
+                            itemOrdered.TotalCost = total;
+                        }
+                        else if (discount.Percentage.HasValue && multiBuyDiscountedUnits >= quantity)
+                        {
+                            // All units discounted (fallback): apply percentage to all
+                            decimal calculatedDiscountedCost = PriceCalculationHelper.CalculateDiscountedCost(pricePerItem, quantity, discount.Percentage.Value);
+                            itemOrdered.DiscountedCost = calculatedDiscountedCost;
+                            itemOrdered.TotalCost = calculatedDiscountedCost;
+                        }
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+            return itemOrdered;
         }
     }
 }

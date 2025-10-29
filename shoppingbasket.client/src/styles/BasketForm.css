@@ -1,5 +1,5 @@
 #basket-form {
-    background-color: rgb(231, 255, 234);
+    background-color: rgb(227, 255, 230);
     width: 30em;
     max-width: 100%;
     margin: 2rem;
@@ -10,6 +10,11 @@
 label {
     display: block;
     margin: 1rem;
+}
+
+.discount-description {
+    color: rgb(254, 97, 0);
+    margin: 0;
 }
 
 .quantity-inputs {
@@ -25,8 +30,7 @@ label {
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.94);
 }
 
-p[role="alert"],
-.error {
+.error-message {
     color: rgb(241, 4, 4);
     font-size: medium;
 }
