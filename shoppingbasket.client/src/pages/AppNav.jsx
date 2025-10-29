@@ -7,10 +7,14 @@ function AppNav({ homeRef, historyRef }) {
       <nav>
         <ul id="horizontal-navbar">
           <li className="navbar-ref">
-            <Link to={homeRef}>Home</Link>
+            <Link to={homeRef} id="home-link">
+              Home
+            </Link>
           </li>
           <li className="navbar-ref">
-            <Link to={historyRef}>History</Link>
+            <Link to={historyRef} id="history-link">
+              History
+            </Link>
           </li>
         </ul>
       </nav>
