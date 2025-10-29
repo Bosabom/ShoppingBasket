@@ -28,7 +28,7 @@ Optional: start the server on fixed URLs (useful for local proxying)
 
 - Open the solution, set `ShoppingBasket.Server` as the startup project and press **F5** (debug) or **Ctrl+F5** (run without debugger). You can also edit `__launchSettings.json__` to change the `applicationUrl` for the project profile.
 
-## Run tests
+## Run unit tests
 
 - From solution or test project folder:
   - `dotnet test`
@@ -36,14 +36,21 @@ Optional: start the server on fixed URLs (useful for local proxying)
 ## Notes
 
 - If the server uses EF Core migrations at startup, ensure the target database exists and the connection string in `appsettings.json` (or environment variables) is correct.
-- For front-end development, run the client separately (see project README or package.json in `shoppingbasket.client`) and configure a proxy (e.g. Vite) to the server URL above if needed
 
-cd path/to/shoppingbasket.client
-npm install
-npm run dev
+## Run the client from the command line
 
-npx cypress open
+- For front-end development, run the client separately (if it wasn't run with server) (see project README or package.json in `shoppingbasket.client`) and configure a proxy (e.g. Vite) to the server URL above if needed
 
-# or headless:
+1. Open a terminal and change to the server project folder:
+   - `cd path/to/shoppingbasket.client`
+2. Run npm install:
+   - `npm install`
+3. Build the project:
+   - `npm run dev`
 
-npx cypress run
+## Run integration tests (e2e)
+
+- From solution or test project folder:
+  - `npx cypress open`
+  # or headless:
+  - `npx cypress run`
