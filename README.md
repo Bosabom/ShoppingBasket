@@ -1,6 +1,11 @@
 ﻿# ShoppingBasket
 
-A small demo shopping-basket application with a .NET 9 Web API backend and a React (Vite) frontend. The project demonstrates item catalog, discounts, receipt creation and history.
+A shopping-basket application with a .NET 9 Web API backend and a React (Vite) frontend.
+The project demonstrates item catalog, discounts, receipt creation and history.
+User have an opportunity to enter quantities of listed products and submit form.
+After that, under the form the receipt will be generated (with list of items, their costs and discounted costs).
+Receipt by itself contains auto-generated number, created date and total cost.
+Also User can view history of past transactions.
 
 ## Project functionality
 
@@ -14,8 +19,7 @@ A small demo shopping-basket application with a .NET 9 Web API backend and a Rea
   - `GET /receipts/history` — short receipts list for history UI.
   - `POST /receipts` — create a receipt from a request with item quantities.
 - Receipt creation:
-  - Loads requested items, applies discounts and multi-item rules, calculates per-line and receipt totals, and persists the receipt.
-  - Implements a multi‑buy example: "Buy 2 tins of soup and get a loaf of bread for half price" — the server computes eligible discounted bread units and applies the discount.
+  - Loads requested items, applies discounts, calculates per-line and receipt totals, and persists the receipt.
   - Supports percentage discounts (per-item) and multi-buy discounts (target item receives discount for eligible units).
 - Persistence and mapping:
   - Uses Entity Framework Core with Npgsql (PostgreSQL) and applies EF migrations at startup.
@@ -24,22 +28,21 @@ A small demo shopping-basket application with a .NET 9 Web API backend and a Rea
   - Throws domain `BadRequestException` for invalid requests (e.g., all zero quantities, missing items) which the middleware maps to HTTP Problem responses.
 - Tests:
   - Unit tests with `xUnit` exercise calculation logic and validation.
-  - Integration / e2e tests may be added (Cypress used in the client project for UI tests).
 
 ### Client (`shoppingbasket.client`)
 
 - Single page React app (Vite) that:
-  - Renders a `BasketForm` where users enter quantities for Soup, Bread, Milk and Apples.
-  - Shows available discounts inline (e.g. "Buy 2 tins of soup and get a loaf of bread for half price", "10% off apples").
+  - Renders a `BasketForm` where users enter quantities for available items (Soup, Bread, Milk and Apples).
+  - Shows available discounts inline.
   - Submits `POST /receipts` and displays the created receipt via `GeneratedReceipt` component.
   - Provides a `ReceiptsTable` page that fetches `GET /receipts/history` and lists past receipts.
 - Form UX:
   - Uses `react-hook-form` for input handling and client-side validation.
   - Displays server error messages returned as problem details when receipt creation fails.
 - Tests:
-  - Cypress e2e tests (in `shoppingbasket.client/cypress`) for navigation, form behavior and history page rendering.
+  - Cypress e2e tests (in `shoppingbasket.client/cypress`)
 - HTTP:
-  - Client uses a small `httpService` wrapper (axios or similar) to call the API. For local development use a Vite proxy or run client and server on the same origin.
+  - Client uses a small `httpService` wrapper (axios) to call the API.
 
 ## Tech stack
 
@@ -54,7 +57,7 @@ A small demo shopping-basket application with a .NET 9 Web API backend and a Rea
   - Vite (dev server / build)
   - react-hook-form (form handling)
   - Cypress (end-to-end tests)
-  - axios (via a small `httpService` wrapper) — used for API calls
+  - axios — used for API calls
 - Dev / tooling
   - dotnet CLI (`dotnet restore`, `dotnet build`, `dotnet run`, `dotnet test`)
   - npm / Node.js (client, Vite, Cypress)
