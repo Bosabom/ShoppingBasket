@@ -7,7 +7,7 @@
             return Math.Round(pricePerUnit * quantity, 2);
         }
 
-        public static decimal CalculateDiscountedCost(decimal pricePerUnit, int quantity, decimal percentage)
+        public static decimal CalculateDiscountedCost(decimal pricePerUnit, int quantity, decimal percentage = 0)
         {
             var subTotalCost = CalculateSubTotalCost(pricePerUnit, quantity);
             var discountAmount = Math.Round(subTotalCost * (percentage / 100m), 2);

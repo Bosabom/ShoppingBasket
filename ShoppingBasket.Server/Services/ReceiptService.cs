@@ -29,28 +29,43 @@ namespace ShoppingBasket.Server.Services
         public async Task<IEnumerable<ReceiptDto>> GetAllReceiptsAsync()
         {
             var receipts = await _receiptRepository.GetAllAsync();
+            if (receipts is null)
+            {
+                throw new BadRequestException("No receipts were found.");
+            }
             return receipts.Adapt<IEnumerable<ReceiptDto>>();
         }
 
         public async Task<ReceiptDto> GetReceiptByIdAsync(long id)
         {
             var receipt = await _receiptRepository.GetByIdAsync(id);
+            if(receipt is null)
+            {
+                throw new BadRequestException("No receipt was found.");
+            }
             return receipt.Adapt<ReceiptDto>();
         }
 
         public async Task<ReceiptDto> GetDetailedReceiptByIdAsync(long id)
         {
             var receipt = await _receiptRepository.GetDetailedByIdAsync(id);
+            if (receipt is null)
+            {
+                throw new BadRequestException("No receipt was found.");
+            }
             return receipt.Adapt<ReceiptDto>();
         }
 
         public async Task<IEnumerable<ReceiptShortDto>> GetReceiptsHistoryAsync()
         {
             var receipts = await _receiptRepository.GetAllAsync();
+            if (receipts is null)
+            {
+                throw new BadRequestException("No receipts for history were found.");
+            }
             return receipts.Adapt<IEnumerable<ReceiptShortDto>>();
         }
 
-        //TODO: refactor this method in future
         public async Task<ReceiptDto> CreateReceiptAsync(ReceiptCreateDto receiptCreateDto)
         {
             var requested = new Dictionary<ItemType, int>()
@@ -70,6 +85,10 @@ namespace ShoppingBasket.Server.Services
 
             // load items from DB
             var items = await _itemRepository.GetAllAsync();
+            if(items is null)
+            {
+                throw new BadRequestException("No items found in catalog.");
+            }
 
             // filter items to only those requested by itemType
             var selectedItems = items.Where(i => itemTypesQuantities.Any(kv => kv.Key == i.ItemType)).ToList();
@@ -97,6 +116,7 @@ namespace ShoppingBasket.Server.Services
             return createdReceipt.Adapt<Receipt, ReceiptDto>();
         }
 
+        //TODO: refactor this method in future
         private async Task<List<ItemOrdered>> BuildItemsOrdered(List<Item> selectedItems, KeyValuePair<ItemType, int>[] TypeQuantityKeyValuePairs)
         {
             var itemsOrdered = new List<ItemOrdered>();
@@ -141,6 +161,7 @@ namespace ShoppingBasket.Server.Services
             return itemsOrdered;
         }
 
+        //TODO: refactor this method in future
         private ItemOrdered SetItemOrdered(long itemId, decimal pricePerItem, int quantity, Discount? discount = null, int multiBuyDiscountedUnits = 0)
         {
             decimal calculatedSubTotalCost = PriceCalculationHelper.CalculateSubTotalCost(pricePerItem, quantity);
@@ -154,11 +175,8 @@ namespace ShoppingBasket.Server.Services
             };
 
             // apply discount if any
-            if (discount != null)
+            if (discount != null && discount.IsActive)
             {
-                itemOrdered.IsDiscounted = true;
-                itemOrdered.DiscountId = discount.DiscountId;
-
                 switch (discount.DiscountType)
                 {
                     case DiscountType.Percentage:
@@ -167,6 +185,8 @@ namespace ShoppingBasket.Server.Services
                             decimal calculatedDiscountedCost = PriceCalculationHelper.CalculateDiscountedCost(pricePerItem, quantity, discount.Percentage.Value);
                             itemOrdered.DiscountedCost = calculatedDiscountedCost;
                             itemOrdered.TotalCost = calculatedDiscountedCost;
+                            itemOrdered.IsDiscounted = true;
+                            itemOrdered.DiscountId = discount.DiscountId;
                         }
                         break;
 
@@ -182,9 +202,10 @@ namespace ShoppingBasket.Server.Services
                             decimal remainingPartTotal = PriceCalculationHelper.CalculateSubTotalCost(pricePerItem, remainingUnits);
                             // total cost = discounted part + remaining part
                             decimal total = Math.Round(discountedPartTotal + remainingPartTotal, 2);
-
                             itemOrdered.DiscountedCost = discountedPartTotal;
                             itemOrdered.TotalCost = total;
+                            itemOrdered.IsDiscounted = true;
+                            itemOrdered.DiscountId = discount.DiscountId;
                         }
                         else if (discount.Percentage.HasValue && multiBuyDiscountedUnits >= quantity)
                         {
@@ -192,6 +213,8 @@ namespace ShoppingBasket.Server.Services
                             decimal calculatedDiscountedCost = PriceCalculationHelper.CalculateDiscountedCost(pricePerItem, quantity, discount.Percentage.Value);
                             itemOrdered.DiscountedCost = calculatedDiscountedCost;
                             itemOrdered.TotalCost = calculatedDiscountedCost;
+                            itemOrdered.IsDiscounted = true;
+                            itemOrdered.DiscountId = discount.DiscountId;
                         }
                         break;
 
