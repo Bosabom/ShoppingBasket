@@ -7,6 +7,7 @@ using ShoppingBasket.Server.Data;
 using ShoppingBasket.Server.DataTransfer;
 using ShoppingBasket.Server.Repositories;
 using ShoppingBasket.Server.Services;
+using ShoppingBasket.Server.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DbConnection");
@@ -34,6 +35,8 @@ builder.Services.AddScoped<IItemService, ItemService>();
 builder.Services.AddScoped<IReceiptService, ReceiptService>();
 builder.Services.AddScoped<IDiscountService, DiscountService>();
 
+// Register Mapster configuration
+builder.Services.RegisterMapsterConfiguration();
 var app = builder.Build();
 
 app.UseDefaultFiles();

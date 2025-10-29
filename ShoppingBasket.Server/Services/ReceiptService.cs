@@ -1,7 +1,6 @@
-﻿using AutoMapper;
+﻿using Mapster;
 using ShoppingBasket.Server.DataTransfer;
 using ShoppingBasket.Server.Enums;
-using ShoppingBasket.Server.MappingProfiles;
 using ShoppingBasket.Server.Models;
 using ShoppingBasket.Server.Repositories;
 using ShoppingBasket.Server.Utils;
@@ -15,47 +14,40 @@ namespace ShoppingBasket.Server.Services
         private readonly IItemRepository _itemRepository;
         private readonly IDiscountRepository _discountRepository;
         private ILoggerFactory _loggerFactory;
-        private readonly Mapper _mapper;
-        private readonly MapperConfiguration _mapperConfig;
 
-        public ReceiptService(IReceiptRepository receiptRepository, 
-            IItemRepository itemRepository, 
-            IDiscountRepository discountRepository, 
+        public ReceiptService(IReceiptRepository receiptRepository,
+            IItemRepository itemRepository,
+            IDiscountRepository discountRepository,
             ILoggerFactory loggerFactory)
         {
             _receiptRepository = receiptRepository;
             _itemRepository = itemRepository;
             _discountRepository = discountRepository;
             _loggerFactory = loggerFactory;
-            _mapperConfig = new MapperConfiguration(cfg =>
-            {
-                cfg.AddProfile(new ReceiptMappingProfile());
-            }, _loggerFactory);
-            _mapper = new Mapper(_mapperConfig);
         }
 
         public async Task<IEnumerable<ReceiptDto>> GetAllReceiptsAsync()
         {
             var receipts = await _receiptRepository.GetAllAsync();
-            return _mapper.Map<IEnumerable<Receipt>, IEnumerable<ReceiptDto>>(receipts);
+            return receipts.Adapt<IEnumerable<ReceiptDto>>();
         }
 
         public async Task<ReceiptDto> GetReceiptByIdAsync(long id)
         {
             var receipt = await _receiptRepository.GetByIdAsync(id);
-            return _mapper.Map<Receipt, ReceiptDto>(receipt);
+            return receipt.Adapt<ReceiptDto>();
         }
 
         public async Task<ReceiptDto> GetDetailedReceiptByIdAsync(long id)
         {
             var receipt = await _receiptRepository.GetDetailedByIdAsync(id);
-            return _mapper.Map<Receipt, ReceiptDto>(receipt);
+            return receipt.Adapt<ReceiptDto>();
         }
 
         public async Task<IEnumerable<ReceiptShortDto>> GetReceiptsHistoryAsync()
         {
             var receipts = await _receiptRepository.GetAllAsync();
-            return _mapper.Map<IEnumerable<Receipt>, IEnumerable<ReceiptShortDto>>(receipts);
+            return receipts.Adapt<IEnumerable<ReceiptShortDto>>();
         }
 
         //TODO: refactor this method in future
@@ -102,7 +94,7 @@ namespace ShoppingBasket.Server.Services
             };
 
             var createdReceipt = await _receiptRepository.CreateAsync(receiptToCreate);
-            return _mapper.Map<Receipt, ReceiptDto>(createdReceipt);
+            return createdReceipt.Adapt<Receipt, ReceiptDto>();
         }
 
         private async Task<List<ItemOrdered>> BuildItemsOrdered(List<Item> selectedItems, KeyValuePair<ItemType, int>[] TypeQuantityKeyValuePairs)

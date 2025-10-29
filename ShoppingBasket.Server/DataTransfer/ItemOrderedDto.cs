@@ -18,6 +18,6 @@
 
         public decimal TotalCost { get; set; }
 
-        public string ItemDescription { get; set; } = string.Empty;
+        public string ItemDescription { get; set; }
     }
 }
