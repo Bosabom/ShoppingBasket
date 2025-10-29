@@ -31,6 +31,7 @@ namespace ShoppingBasket.Server.Utils
                 .Map(dest => dest.ReceiptNumber,
                      src => src.ReceiptNumber.ToString("D8"));
 
+            TypeAdapterConfig.GlobalSettings.Default.PreserveReference(true);
             TypeAdapterConfig.GlobalSettings.Scan(Assembly.GetExecutingAssembly());
         }
     }
