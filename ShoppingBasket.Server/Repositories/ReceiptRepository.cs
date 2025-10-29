@@ -14,15 +14,15 @@ namespace ShoppingBasket.Server.Repositories
 
         public async Task<IEnumerable<Receipt>> GetAllAsync()
         {
-            return await _db.Receipts.AsNoTracking().ToListAsync();
+            return await _db.Receipts.ToListAsync();
         }
 
-        // Retrieve a receipt by its ID, including related items ordered
         public async Task<Receipt> GetByIdAsync(long id)
         {
             return await _db.Receipts.FindAsync(id);// may be null
         }
 
+        // Retrieve a receipt by its ID, including related items ordered
         public async Task<Receipt> GetDetailedByIdAsync(long id)
         {
             var receipt = await _db.Receipts
@@ -32,10 +32,11 @@ namespace ShoppingBasket.Server.Repositories
             return receipt;// may be null
         }
 
-        //TODO: implement CreateReceipt method
-        public async Task<Receipt> CreateAsync(Receipt receipt)
+        public async Task<Receipt> CreateAsync(Receipt receiptToCreate)
         {
-            throw new NotImplementedException();
+            var createdReceipt = await _db.Receipts.AddAsync(receiptToCreate);
+            await _db.SaveChangesAsync();
+            return createdReceipt.Entity;
         }
     }
 }

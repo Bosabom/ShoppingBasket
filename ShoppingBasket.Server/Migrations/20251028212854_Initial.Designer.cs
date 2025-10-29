@@ -12,7 +12,7 @@ using ShoppingBasket.Server.Data;
 namespace ShoppingBasket.Server.Migrations
 {
     [DbContext(typeof(ShoppingBasketDbContext))]
-    [Migration("20251027192107_Initial")]
+    [Migration("20251028212854_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -24,6 +24,74 @@ namespace ShoppingBasket.Server.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.HasSequence("receipt_number_seq");
+
+            modelBuilder.Entity("ShoppingBasket.Server.Models.Discount", b =>
+                {
+                    b.Property<long>("DiscountId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("discount_id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("DiscountId"));
+
+                    b.Property<int>("DiscountType")
+                        .HasColumnType("integer")
+                        .HasColumnName("discount_type");
+
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("end_date");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_active");
+
+                    b.Property<long>("ItemId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("item_id");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("name");
+
+                    b.Property<decimal?>("Percentage")
+                        .HasColumnType("numeric")
+                        .HasColumnName("percentage");
+
+                    b.Property<DateTime?>("StartDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("start_date");
+
+                    b.HasKey("DiscountId");
+
+                    b.HasIndex("ItemId")
+                        .IsUnique();
+
+                    b.ToTable("discount");
+
+                    b.HasData(
+                        new
+                        {
+                            DiscountId = 1L,
+                            DiscountType = 0,
+                            IsActive = true,
+                            ItemId = 4L,
+                            Name = "Apples 10% off",
+                            Percentage = 10m
+                        },
+                        new
+                        {
+                            DiscountId = 2L,
+                            DiscountType = 1,
+                            IsActive = true,
+                            ItemId = 2L,
+                            Name = "Buy 2 soups get bread half price",
+                            Percentage = 50m
+                        });
+                });
 
             modelBuilder.Entity("ShoppingBasket.Server.Models.Item", b =>
                 {
@@ -91,9 +159,13 @@ namespace ShoppingBasket.Server.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("ItemOrderedId"));
 
-                    b.Property<decimal?>("DiscountedPrice")
+                    b.Property<long?>("DiscountId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("discount_id");
+
+                    b.Property<decimal?>("DiscountedCost")
                         .HasColumnType("numeric")
-                        .HasColumnName("discounted_price");
+                        .HasColumnName("discounted_cost");
 
                     b.Property<bool>("IsDiscounted")
                         .HasColumnType("boolean")
@@ -103,10 +175,6 @@ namespace ShoppingBasket.Server.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("item_id");
 
-                    b.Property<decimal>("Price")
-                        .HasColumnType("numeric")
-                        .HasColumnName("price");
-
                     b.Property<int>("Quantity")
                         .HasColumnType("integer")
                         .HasColumnName("quantity");
@@ -115,7 +183,17 @@ namespace ShoppingBasket.Server.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("receipt_id");
 
+                    b.Property<decimal>("SubTotalCost")
+                        .HasColumnType("numeric")
+                        .HasColumnName("sub_total_cost");
+
+                    b.Property<decimal>("TotalCost")
+                        .HasColumnType("numeric")
+                        .HasColumnName("total_cost");
+
                     b.HasKey("ItemOrderedId");
+
+                    b.HasIndex("DiscountId");
 
                     b.HasIndex("ItemId");
 
@@ -137,30 +215,39 @@ namespace ShoppingBasket.Server.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_datetime");
 
-                    b.Property<string>("ReceiptNumber")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("receipt_number");
-
-                    b.Property<decimal>("SubTotalCost")
-                        .HasColumnType("numeric")
-                        .HasColumnName("sub_total_cost");
+                    b.Property<long>("ReceiptNumber")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("receipt_number")
+                        .HasDefaultValueSql("nextval('receipt_number_seq')");
 
                     b.Property<decimal>("TotalCost")
                         .HasColumnType("numeric")
                         .HasColumnName("total_cost");
-
-                    b.Property<decimal?>("TotalDiscount")
-                        .HasColumnType("numeric")
-                        .HasColumnName("total_discount");
 
                     b.HasKey("ReceiptId");
 
                     b.ToTable("receipt");
                 });
 
+            modelBuilder.Entity("ShoppingBasket.Server.Models.Discount", b =>
+                {
+                    b.HasOne("ShoppingBasket.Server.Models.Item", "Item")
+                        .WithOne("Discount")
+                        .HasForeignKey("ShoppingBasket.Server.Models.Discount", "ItemId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Item");
+                });
+
             modelBuilder.Entity("ShoppingBasket.Server.Models.ItemOrdered", b =>
                 {
+                    b.HasOne("ShoppingBasket.Server.Models.Discount", "Discount")
+                        .WithMany()
+                        .HasForeignKey("DiscountId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("ShoppingBasket.Server.Models.Item", "Item")
                         .WithMany("ItemsOrdered")
                         .HasForeignKey("ItemId")
@@ -173,6 +260,8 @@ namespace ShoppingBasket.Server.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Discount");
+
                     b.Navigation("Item");
 
                     b.Navigation("Receipt");
@@ -180,6 +269,8 @@ namespace ShoppingBasket.Server.Migrations
 
             modelBuilder.Entity("ShoppingBasket.Server.Models.Item", b =>
                 {
+                    b.Navigation("Discount");
+
                     b.Navigation("ItemsOrdered");
                 });
 

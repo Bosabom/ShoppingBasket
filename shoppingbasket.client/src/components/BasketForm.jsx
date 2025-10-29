@@ -1,6 +1,8 @@
 import "/src/styles/BasketForm.css";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import httpService from "../utils/httpService";
+import GeneratedReceipt from "./GeneratedReceipt";
 
 function BasketForm() {
   const {
@@ -9,24 +11,35 @@ function BasketForm() {
     formState: { errors },
   } = useForm();
 
-  //FIXME: implement proper post request and handling data from response for Receipt generation on UI
-  const createReceipt = async (data) => {
+  const [receipt, setReceipt] = useState(null);
+  const [error, setError] = useState(null);
+
+  //TODO: move this to separate receiptsService based on httpService with defined requests
+  const createReceipt = async (requestBody) => {
     try {
-      //forming body .json()
-      const requestBody = data;
+      setError(null);
       const response = await httpService.post("/receipts", requestBody);
-      console.log("payload", data);
-      console.log("response", response);
-    } catch (error) {
-      console.log("Error creating receipt", error);
+
+      //handle response
+      const created = response && response.data ? response.data : response;
+      setReceipt(created);
+    } catch (err) {
+      //handle error
+      console.error("Error creating receipt", err);
+      setError(
+        err && err.response.data.detail
+          ? err.response.data.detail
+          : "Failed to create receipt. See console for details."
+      );
     }
   };
 
-  //TODO: move inputs to separate component with this signatures and errors handling
+  //TODO: fetch item and discounts data from API to populate into form
   return (
     <>
       {/*Shopping basket form*/}
       <form id="basket-form" onSubmit={handleSubmit(createReceipt)}>
+        {/* TODO: move inputs to separate component with this signatures and errors handling */}
         {/*Soup quantity input*/}
         <label htmlFor="soup-quantity">Soup (€0.65)</label>
         <input
@@ -43,7 +56,6 @@ function BasketForm() {
         {errors.soupQuantity?.type === "min" && (
           <p role="alert">Soup quantity should be greater than 0!</p>
         )}
-
         {/*Bread quantity input*/}
         <label htmlFor="bread-quantity">Bread (€0.8)</label>
         <input
@@ -60,7 +72,6 @@ function BasketForm() {
         {errors.breadQuantity?.type === "min" && (
           <p role="alert">Bread quantity should be greater than 0!</p>
         )}
-
         {/*Milk quantity input*/}
         <label htmlFor="milk-quantity">Milk (€1.3)</label>
         <input
@@ -77,7 +88,6 @@ function BasketForm() {
         {errors.milkQuantity?.type === "min" && (
           <p role="alert">Milk quantity should be greater than 0!</p>
         )}
-
         {/*Apples quantity input*/}
         <label htmlFor="apples-quantity">Apples (€1.00 per bag)</label>
         <input
@@ -96,6 +106,18 @@ function BasketForm() {
         )}
         <input type="submit" id="button-submit-form" value="Submit" />
       </form>
+
+      {error && <p className="error">{error}</p>}
+
+      {/* Render generated receipt when available */}
+      {receipt && (
+        <div className="generated-receipt-wrapper">
+          <GeneratedReceipt
+            receipt={receipt}
+            onClose={() => setReceipt(null)}
+          />
+        </div>
+      )}
     </>
   );
 }

@@ -11,14 +11,9 @@ namespace ShoppingBasket.Server.Models
         [Column("receipt_id")]
         public long ReceiptId { get; set; }
 
+        // Sequential receipt number generated from a database sequence
         [Column("receipt_number")]
-        public string ReceiptNumber { get; set; }
-
-        [Column("sub_total_cost")]
-        public decimal SubTotalCost { get; set; }
-
-        [Column("total_discount")]
-        public decimal? TotalDiscount { get; set; }
+        public long ReceiptNumber { get; set; }
 
         [Column("total_cost")]
         public decimal TotalCost { get; set; }

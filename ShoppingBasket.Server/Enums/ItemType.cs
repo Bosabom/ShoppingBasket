@@ -2,7 +2,7 @@
 {
     public enum ItemType
     {
-        Soup,
+        Soup = 0,
         Bread,
         Milk,
         Apple

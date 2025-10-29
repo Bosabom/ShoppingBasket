@@ -8,7 +8,7 @@ namespace ShoppingBasket.Server.Repositories
     {
         private ShoppingBasketDbContext _db;
 
-        //TODO: add methods for itemOrdered if needed
+        //TODO: add item creation, update, delete methods if needed
         public ItemRepository(ShoppingBasketDbContext context)
         {
             _db = context;
@@ -16,7 +16,7 @@ namespace ShoppingBasket.Server.Repositories
 
         public async Task<IEnumerable<Item>> GetAllAsync()
         {
-            return await _db.Items.AsNoTracking().ToListAsync();
+            return await _db.Items.ToListAsync();
         }
 
         public async Task<Item> GetByIdAsync(long id)

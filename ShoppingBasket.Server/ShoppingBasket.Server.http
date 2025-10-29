@@ -25,3 +25,13 @@ GET {{ShoppingBasket.Server_HostAddress}}/receipts/history
 Accept: application/json
 
 ###
+
+POST {{ShoppingBasket.Server_HostAddress}}/receipts
+Content-Type: application/json
+{
+  "soupQuantity": 1,
+  "breadQuantity": 1,
+  "milkQuantity": 1,
+  "applesQuantity": 1
+}
+###

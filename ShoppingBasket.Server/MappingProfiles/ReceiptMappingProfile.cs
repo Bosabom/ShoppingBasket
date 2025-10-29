@@ -9,10 +9,19 @@ namespace ShoppingBasket.Server.MappingProfiles
         public ReceiptMappingProfile()
         {
             //add more mappings if needed
-            CreateMap<Receipt, ReceiptDto>().ReverseMap();
-            CreateMap<Receipt, ReceiptShortDto>();
-            //TODO: implement mapping for ReceiptCreateDto to Receipt
-            //CreateMap<ReceiptCreateDto, Receipt>();
+            CreateMap<Receipt, ReceiptDto>()
+                .ForMember(dest => dest.ItemsOrdered,
+                           opt => opt.MapFrom(src => src.ItemsOrdered))
+                .ForMember(dest => dest.ReceiptNumber,
+                           opt => opt.MapFrom(src => src.ReceiptNumber.ToString("D8")));
+
+            CreateMap<Receipt, ReceiptShortDto>()
+                .ForMember(dest => dest.ReceiptNumber,
+                           opt => opt.MapFrom(src => src.ReceiptNumber.ToString("D8")));
+
+            CreateMap<ItemOrdered, ItemOrderedDto>()
+                .ForMember(dest => dest.ItemDescription,
+                           opt => opt.MapFrom(src => src.Item != null ? src.Item.Description : string.Empty));
         }
     }
 }

@@ -17,7 +17,6 @@ http.interceptors.response.use(
 );
 
 // Export simple async/await wrappers
-//TODO: remove config params
 export const httpService = {
   get: async (url, config) => {
     const response = await http.get(url, config);

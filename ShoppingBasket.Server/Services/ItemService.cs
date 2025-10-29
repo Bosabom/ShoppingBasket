@@ -23,6 +23,8 @@ namespace ShoppingBasket.Server.Services
             }, _loggerFactory);
             _mapper = new Mapper(_mapperConfig);
         }
+
+        //TODO: add more methods for creating, updating, deleting items
         public async Task<IEnumerable<ItemDto>> GetAllItemsAsync()
         {
             var items = await _itemRepository.GetAllAsync();

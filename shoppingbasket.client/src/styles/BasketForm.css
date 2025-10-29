@@ -25,7 +25,8 @@ label {
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.94);
 }
 
-p[role="alert"] {
+p[role="alert"],
+.error {
     color: rgb(241, 4, 4);
     font-size: medium;
 }

@@ -23,19 +23,33 @@ namespace ShoppingBasket.Server.Models
         public int Quantity { get; set; }
 
         // unit price stored on the ordered line
-        [Column("price")]
-        public decimal Price { get; set; }
+        [Column("sub_total_cost")]
+        public decimal SubTotalCost { get; set; }
 
         [Column("is_discounted")]
         public bool IsDiscounted { get; set; }
 
-        [Column("discounted_price")]
-        public decimal? DiscountedPrice { get; set; }
+        // optional link to the discount that affected this line (nullable)
+        [Column("discount_id")]
+        public long? DiscountId { get; set; }
 
+        // per-unit discounted price after applying discounts (nullable)
+        [Column("discounted_cost")]
+        public decimal? DiscountedCost { get; set; }
+
+        [Column("total_cost")]
+        public decimal TotalCost { get; set; }
+
+        // Navigation: the item associated with this orderedItem
         [ForeignKey(nameof(ItemId))]
         public virtual Item? Item { get; set; }
 
+        // Navigation: the receipt associated with this orderedItem
         [ForeignKey(nameof(ReceiptId))]
         public virtual Receipt? Receipt { get; set; }
+
+        // Navigation: the discount associated with this orderedItem
+        [ForeignKey(nameof(DiscountId))]
+        public virtual Discount? Discount { get; set; }
     }
 }

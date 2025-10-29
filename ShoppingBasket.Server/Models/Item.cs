@@ -22,6 +22,9 @@ namespace ShoppingBasket.Server.Models
         [Column("price")]
         public decimal Price { get; set; }
 
+        // Navigation: the discount associated with this item
+        public Discount? Discount { get; set; }
+
         // Navigation: all ordered lines that reference this item
         public virtual ICollection<ItemOrdered> ItemsOrdered { get; set; } = new HashSet<ItemOrdered>();
     }

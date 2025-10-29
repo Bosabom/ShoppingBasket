@@ -54,6 +54,10 @@ export default defineConfig({
             '^/receipts': {
                 target,
                 secure: false
+            },
+            '^/discounts': {
+                target,
+                secure: false
             }
         },
         port: parseInt(env.DEV_SERVER_PORT || '51479'),
