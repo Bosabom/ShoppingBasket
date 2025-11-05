@@ -133,11 +133,9 @@ If you run the client separately, configure a Vite proxy to forward `/receipts`,
      npx cypress open
      ```
    - Or headless:
+     ```bash
      npx cypress run
-
-   ```
-
-   ```
+     ```
 
 ## Notes and gotchas
 
