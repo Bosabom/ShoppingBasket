@@ -4,7 +4,7 @@ context('Receipts history page', () => {
     cy.visit('/history')
   })
 
-  it('renders receipts table from /receipts/history', () => {
+  it('renders receipts table from /receipts/history (mocking response)', () => {
     const receipts = [
       {
         receiptId: 101,
@@ -43,7 +43,7 @@ context('Receipts history page', () => {
     });
   });
 
-  it('shows loading placeholder when receipts undefined and then renders', () => {
+  it('shows loading placeholder when receipts undefined and then renders (mocking response)', () => {
     // Use a delayed response to observe loading message
     cy.intercept('GET', '/receipts/history', (req) => {
       req.on('response', (res) => { });
