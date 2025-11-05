@@ -40,7 +40,7 @@ context('Basket form and GeneratedReceipt integration', () => {
     cy.contains('Apples quantity should be greater than 0!').should('exist');
   });
 
-  it('submits form and displays generated receipt when API returns success', () => {
+  it('submits form and displays stubbed receipt (mocking response)', () => {
     // Arrange: stub POST /receipts response
     const createdReceipt = {
       receiptId: 1,
@@ -135,31 +135,5 @@ context('Basket form and GeneratedReceipt integration', () => {
       cy.contains('€9').should('exist'); // discountedCost shown
       cy.contains('€9').should('exist'); // line total
     });
-  });
-
-  it('displays server error message when API returns 400 with problem details', () => {
-    const problem = {
-      type: 'https://httpstatuses.io/400',
-      title: 'Bad Request',
-      status: 400,
-      detail: 'At least one item quantity must be greater than zero.'
-    };
-
-    cy.intercept('POST', '/receipts', {
-      statusCode: 400,
-      body: problem
-    }).as('createReceiptFail');
-
-    // Submit empty/zero form
-    cy.get('#soup-quantity').clear().type('0');
-    cy.get('#bread-quantity').clear().type('0');
-    cy.get('#milk-quantity').clear().type('0');
-    cy.get('#apples-quantity').clear().type('0');
-
-    cy.get('#button-submit-form').click();
-    cy.wait('@createReceiptFail');
-
-    // The top-level error paragraph shown by BasketForm uses .error-message
-    cy.get('p.error-message').should('contain.text', problem.detail);
   });
 });

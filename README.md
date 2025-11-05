@@ -122,6 +122,7 @@ Optional: start the server on fixed URLs (useful for local proxying)
 If you run the client separately, configure a Vite proxy to forward `/receipts`, `/items`, `/discounts` to the server URL.
 
 3. Run tests
+
    - Server unit tests:
      ```bash
      dotnet test
@@ -130,7 +131,9 @@ If you run the client separately, configure a Vite proxy to forward `/receipts`,
      ```bash
      cd shoppingbasket.client
      npx cypress open
-     # or headless:
+     ```
+   - Or headless:
+     ```bash
      npx cypress run
      ```
 
@@ -139,3 +142,4 @@ If you run the client separately, configure a Vite proxy to forward `/receipts`,
 - Ensure your `appsettings.json` (or environment variables) contains a valid PostgreSQL connection string for EF Core migrations or create the database manually prior to startup.
 - If you run the client separately, either enable CORS in the server or configure the Vite proxy to avoid cross-origin issues.
 - For IDE runs, adjust `ShoppingBasket.Server/Properties/launchSettings.json` `applicationUrl` or use the `--urls` flag when running with `dotnet run`.
+- For testing that frontend and backend work together seamlessly through integration tests: you need to run `integrationtests.cy.js` script (Cypress), with both running client and server projects. Other cypress tests can be executed with only client project running.
